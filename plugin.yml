@@ -1,0 +1,17 @@
+name: CustomTime
+version: 2.0
+main: jcv8000.customtime.CustomTime
+api-version: 1.16
+author: jcv8000
+website: jcv8000.github.io
+prefix: CustomTime
+commands:
+    ct:
+        description: Command to control day/night length
+        usage: /ct [day/night] [value][s/m/h/d/x] [world (optional)]
+        permission: customtime.*
+        permission-message: You do not have permission to use this command.
+permissions:
+  customtime.*:
+   description: Allows the CustomTime commands
+   default: op
