@@ -134,7 +134,7 @@ public class CustomTime extends JavaPlugin {
                                 if (projectedTime > 12000)
                                     data.world.setTime(12000);
                                 else
-                                    data.world.setTime(time + (long)data.dayMult);
+                                    data.world.setTime(projectedTime);
                             }
                         }
                         else { //NIGHT 
@@ -151,7 +151,7 @@ public class CustomTime extends JavaPlugin {
                                 if (projectedTime >= 24000)
                                     data.world.setTime(0);
                                 else
-                                    data.world.setTime(time + (long)data.nightMult);
+                                    data.world.setTime(projectedTime);
                             }
                         }
                         data.tick++;
