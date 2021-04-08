@@ -112,7 +112,6 @@ public class CustomTime extends JavaPlugin {
             @Override
             public void run() {
                 
-                //cache some reused variables
                 long time;
 
                 for (CTWorldData data : ctWorldDatas.values()) {
@@ -129,10 +128,16 @@ public class CustomTime extends JavaPlugin {
                                 }
                             }
                             else if (data.dayMult >= 1.0D) { //speed up or keep normal
-                                data.world.setTime(data.world.getTime() + (long)data.dayMult);
+
+                                long projectedTime = time + (long)data.dayMult;
+
+                                if (projectedTime > 12000)
+                                    data.world.setTime(12000);
+                                else
+                                    data.world.setTime(time + (long)data.dayMult);
                             }
                         }
-                        else if (data.world.getTime() > 12000) { //NIGHT 
+                        else { //NIGHT 
                             if (data.nightMult > 0.0D && data.nightMult < 1.0D) { //slow down
                                 if (data.tick > (1.0D / data.nightMult)) {
                                     data.tick = 0;
@@ -140,7 +145,13 @@ public class CustomTime extends JavaPlugin {
                                 }
                             }
                             else if (data.nightMult >= 1.0D) { //speed up or keep normal
-                                data.world.setTime(data.world.getTime() + (long)data.nightMult);
+
+                                long projectedTime = time + (long)data.nightMult;
+
+                                if (projectedTime >= 24000)
+                                    data.world.setTime(0);
+                                else
+                                    data.world.setTime(time + (long)data.nightMult);
                             }
                         }
                         data.tick++;
