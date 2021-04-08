@@ -1,3 +1,3 @@
-javac -d . -classpath spigot-api.jar src/CustomTime.java src/CTWorldData.java src/CommandCustomTime.java src/CustomTimeTabCompleter.java
-jar cvf CustomTime.jar jcv8000/customtime/*.class plugin.yml
+javac -d . -classpath lib/spigot-api.jar src/jcv8000/customtime/CustomTime.java src/jcv8000/customtime/CTWorldData.java src/jcv8000/customtime/CommandCustomTime.java src/jcv8000/customtime/CustomTimeTabCompleter.java
+jar cf CustomTime.jar jcv8000/customtime/*.class plugin.yml
 rm -r jcv8000/
