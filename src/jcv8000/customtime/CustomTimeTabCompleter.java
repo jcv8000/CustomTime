@@ -23,9 +23,12 @@ public class CustomTimeTabCompleter implements TabCompleter {
                 ArrayList<String> list = new ArrayList<String>();
                 list.add("day");
                 list.add("night");
+                list.add("help");
+                list.add("restart");
                 
                 return list;
-            } else if (args.length == 3) {
+            }
+            else if (args.length == 3 && (args[0].equals("day") || args[0].equals("night"))) {
                 
                 ArrayList<String> list = new ArrayList<String>();
                 for (World w : main.getServer().getWorlds()) {

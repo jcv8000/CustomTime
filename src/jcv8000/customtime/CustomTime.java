@@ -3,12 +3,12 @@ package jcv8000.customtime;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Level;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,7 +25,7 @@ public class CustomTime extends JavaPlugin {
     public ChatColor mainColor;
     public ChatColor importantColor;
     public ChatColor errorColor;
-    boolean canSleep = true;
+    //boolean canSleep = true;
     
     @Override
     public void onEnable() {
@@ -100,13 +100,12 @@ public class CustomTime extends JavaPlugin {
                     getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is true in world '" + w.getName() + "'. This needs to be false for CustomTime to work. Setting to false.");
                     w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
                 } else {
-                    getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is false in world '" + w.getName() + "'. Good!");
+                    getLogger().log(Level.INFO, "Gamerule \"doDaylightCycle\" is false in world '" + w.getName() + "'. Good!");
                 }
             }
         }
         
-        
-        
+
         //Schedule the repeating task that moves time
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -144,49 +143,49 @@ public class CustomTime extends JavaPlugin {
                             }
                         }
                         data.tick++;
+
+                        if (data.world.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE) == true) {
+                            getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is true in world '" + data.world.getName() + "'. This needs to be false for CustomTime to work. Setting to false.");
+                            data.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+                        }
+                        
+                        // SLEEP CHECKING
+                        if (data.world.getTime() > 12000 || data.world.hasStorm()) {
+
+                            List<Player> players = data.world.getPlayers();
+                            List<Player> sleepers = new ArrayList<Player>();
+                            if (players.size() > 0) {
+        
+                                for (Player p : players) {
+                                    if (p.getSleepTicks() >= 100) {
+                                        sleepers.add(p);
+                                    }
+                                }
+        
+                                int sleepersNeeded = (int)(((double)data.world.getGameRuleValue(GameRule.PLAYERS_SLEEPING_PERCENTAGE) / 100.0d) * players.size());
+        
+                                if (sleepers.size() >= sleepersNeeded) {
+
+                                    for (Player p : sleepers) {
+                                        p.wakeup(true);
+                                    }
+
+                                    getLogger().info(sleepers.size() + "/" + sleepersNeeded + " players needed to skip the night are sleeping. Skipping the night.");
+                                    data.world.setTime(0);
+
+                                    // After a storm ends there's clear weather for 0.5-7.5 days, or 12,000-180,000 ticks
+                                    int clearTicks = (int)(Math.random() * (168000) + 12000);
+
+                                    data.world.setClearWeatherDuration(clearTicks);
+                                }
+                            }
+
+                        }
+                        
                     }
                 }
             }
         }, 0L, 1L);
-        
-        //Check to see if all players are sleeping every second, and make sure gamerule is false
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                
-                //cache
-                List<Player> players;
-                
-                for (CTWorldData data : ctWorldDatas.values()) {
-                    if (data.world.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE) == true) {
-                        getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is true in world '" + data.world.getName() + "'. This needs to be false for CustomTime to work. Setting to false.");
-                        data.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-                    }
-                    
-                    players = data.world.getPlayers();
-                    if (players.size() > 0) {
-                        int peopleSleeping = 0;
-                        for (Player p : players) {
-                            if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
-                                if (p.isSleeping() == true) {
-                                    peopleSleeping = peopleSleeping + 1;
-                                }
-                            }
-                        }
-
-                        if (peopleSleeping == data.world.getPlayers().size()) {
-                            
-                            if (canSleep) {
-                                sleep(data.world);
-                                canSleep = false;
-                            }
-                            
-                        }
-                    }
-                }
-                
-            }
-        }, 0L, 20L);
         
         
         this.getCommand("ct").setExecutor(new CommandCustomTime(this));
@@ -197,15 +196,5 @@ public class CustomTime extends JavaPlugin {
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
         ctWorldDatas.clear();
-    }
-    
-    void sleep(World w) {
-        scheduler.runTaskLater(this, new Runnable() {
-            @Override
-            public void run() {
-                w.setTime(0);
-                canSleep = true;
-            }
-        }, 100);
     }
 }
