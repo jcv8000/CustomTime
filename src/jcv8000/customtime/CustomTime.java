@@ -166,10 +166,6 @@ public class CustomTime extends JavaPlugin {
         
                                 if (sleepers.size() >= sleepersNeeded) {
 
-                                    for (Player p : sleepers) {
-                                        p.wakeup(true);
-                                    }
-
                                     getLogger().info(sleepers.size() + "/" + sleepersNeeded + " players needed to skip the night are sleeping. Skipping the night.");
                                     data.world.setTime(0);
 
