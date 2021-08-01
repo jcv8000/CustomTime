@@ -110,15 +110,12 @@ public class CustomTime extends JavaPlugin {
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                
-                //cache some reused variables
-                long time;
 
                 for (CTWorldData data : ctWorldDatas.values()) {
                     
                     if (data.world != null) {
                         
-                        time = data.world.getTime();
+                        long time = data.world.getTime();
                         
                         if (time <= 12000) { //DAY
                             if (data.dayMult > 0.0D && data.dayMult < 1.0D) { //slow down
