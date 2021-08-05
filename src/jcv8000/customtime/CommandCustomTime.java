@@ -35,7 +35,7 @@ public class CommandCustomTime implements CommandExecutor{
             
             if (args.length == 0) { //  /customtime
                 sender.sendMessage(main.mainColor + "---------------------------------------------");
-                sender.sendMessage(main.mainColor + "| " + ChatColor.RED + "CustomTime" + main.mainColor + " version 2.1 by " + ChatColor.GREEN + "jcv8000");
+                sender.sendMessage(main.mainColor + "| " + ChatColor.RED + "CustomTime" + main.mainColor + " version 2.1.1 by " + ChatColor.GREEN + "jcv8000");
                 sender.sendMessage(main.mainColor + "| " + ChatColor.GRAY + "Type " + main.importantColor + "/ct help " + ChatColor.GRAY + "for more info.");
                 sender.sendMessage(main.mainColor + "|");
                 sender.sendMessage(main.mainColor + "| World day/night cycle info:");

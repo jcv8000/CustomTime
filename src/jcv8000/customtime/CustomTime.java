@@ -86,10 +86,18 @@ public class CustomTime extends JavaPlugin {
         
         //print world list to console
         String worldlist = "";
-        for (CTWorldData d : ctWorldDatas.values()) {
-            worldlist += "\n" + d.world.getName();
+        if (ctWorldDatas.size() == 0) {
+            worldlist = "[none]";
         }
-        getLogger().log(Level.INFO, "Worlds in effect of custom time scales:" + worldlist);
+        else {
+            for (CTWorldData d : ctWorldDatas.values()) {
+                worldlist += d.world.getName() + ", ";
+            }
+
+            // remove trailing ", "
+            worldlist = worldlist.substring(0, worldlist.length() - 2);
+        }
+        getLogger().log(Level.INFO, "Worlds in effect of custom time scales: " + worldlist);
         
         
         //Check all loaded worlds and make sure doDaylightCycle is false
@@ -159,7 +167,7 @@ public class CustomTime extends JavaPlugin {
                                     }
                                 }
         
-                                int sleepersNeeded = (int)(((double)data.world.getGameRuleValue(GameRule.PLAYERS_SLEEPING_PERCENTAGE) / 100.0d) * players.size());
+                                int sleepersNeeded = calculateSleepersNeeded(players.size(), data.world.getGameRuleValue(GameRule.PLAYERS_SLEEPING_PERCENTAGE));
         
                                 if (sleepers.size() >= sleepersNeeded) {
 
@@ -183,6 +191,15 @@ public class CustomTime extends JavaPlugin {
         
         this.getCommand("ct").setExecutor(new CommandCustomTime(this));
         this.getCommand("ct").setTabCompleter(new CustomTimeTabCompleter(this));
+    }
+
+    private int calculateSleepersNeeded(int playerCount, int percentage) {
+        int answer = (int)(((double)percentage / 100.0d) * playerCount);
+		
+		if (answer <= 0)
+			return 1;
+		
+		return answer;
     }
     
     @Override
