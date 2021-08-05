@@ -95,7 +95,9 @@ public class CustomTime extends JavaPlugin {
             }
 
             // remove trailing ", "
-            worldlist = worldlist.substring(0, worldlist.length() - 2);
+            if (worldlist.endsWith(", ") && worldlist.length() > 2) {
+                worldlist = worldlist.substring(0, worldlist.length() - 2);
+            }
         }
         getLogger().log(Level.INFO, "Worlds in effect of custom time scales: " + worldlist);
         
