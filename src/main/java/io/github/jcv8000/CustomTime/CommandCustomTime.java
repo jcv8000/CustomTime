@@ -1,4 +1,4 @@
-package jcv8000.customtime;
+package io.github.jcv8000.CustomTime;
 
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
@@ -14,7 +14,7 @@ public class CommandCustomTime implements CommandExecutor{
     public CommandCustomTime(CustomTime inst) {
         main = inst;
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player player = null;
@@ -23,16 +23,16 @@ public class CommandCustomTime implements CommandExecutor{
         if (sender instanceof Player) {
             player = (Player) sender;
             world = player.getWorld();
-            
+
             if (!sender.hasPermission("customtime.*")) {
                 return false;
             }
         } else {
             world = main.mainWorld;
         }
-        
+
         if (cmd.getName().equalsIgnoreCase("ct")) {
-            
+
             if (args.length == 0) { //  /customtime
                 sender.sendMessage(main.mainColor + "---------------------------------------------");
                 sender.sendMessage(main.mainColor + "| " + ChatColor.RED + "CustomTime" + main.mainColor + " version 2.1.1 by " + ChatColor.GREEN + "jcv8000");
@@ -50,7 +50,7 @@ public class CommandCustomTime implements CommandExecutor{
                     sender.sendMessage(main.mainColor + "| - " + main.importantColor + data.world.getName() + main.mainColor + ":" + infoMessage);
                 }
                 sender.sendMessage(main.mainColor + "---------------------------------------------");
-                
+
                 return true;
             }
             else if (args.length == 1) {
@@ -60,7 +60,7 @@ public class CommandCustomTime implements CommandExecutor{
                     try {
                         main.onDisable();
                         main.onEnable();
-                        
+
                         sender.sendMessage(ChatColor.GREEN + "Successfully restarted CustomTime service.");
                         main.getLogger().log(Level.INFO, "Successfully restarted CustomTime service.");
                     }
@@ -81,7 +81,7 @@ public class CommandCustomTime implements CommandExecutor{
                 }
             }
             else if (args.length == 2 || args.length == 3) { //  /customtime [day/night] [value] ?[world]
-                
+
                 if (args.length == 3) { // used [world] parameter
                     try {
                         world = main.getServer().getWorld(args[2]);
@@ -94,7 +94,7 @@ public class CommandCustomTime implements CommandExecutor{
                         return false;
                     }
                 }
-                
+
                 if (args[0].equalsIgnoreCase("day") || args[0].equalsIgnoreCase("night")) {
 
                     String daynight = args[0];
@@ -107,11 +107,11 @@ public class CommandCustomTime implements CommandExecutor{
                                 throw new Exception();
                             }
                             double mult = (10.0D / (num / 60.0D));
-                            
+
                             main.config.set("worlds." + world.getName() + "." + daynight + ".multiplier", mult);
                             main.config.set("worlds." + world.getName() + "." + daynight + ".desc", num + " seconds");
                             main.saveConfig();
-                            
+
                             //ADD THIS WORLD DATA TO THE HASHMAP
                             if (main.ctWorldDatas.containsKey(world.getName())) {
                                 if (daynight.equalsIgnoreCase("day")) {
@@ -130,7 +130,7 @@ public class CommandCustomTime implements CommandExecutor{
                                 }
                             }
                             //ADD THIS WORLD DATA TO THE HASHMAP
-                            
+
                             sender.sendMessage(main.mainColor + "Set world " + main.importantColor + world.getName() + " " + main.mainColor + daynight + " to last " + ChatColor.LIGHT_PURPLE + num + " seconds");
                             main.getLogger().log(Level.INFO, "Set world " + world.getName() + " " + daynight + " to last " + num + " seconds.");
                             return true;
@@ -150,7 +150,7 @@ public class CommandCustomTime implements CommandExecutor{
                             main.config.set("worlds." + world.getName() + "." + daynight + ".multiplier", mult);
                             main.config.set("worlds." + world.getName() + "." + daynight + ".desc", num + " minutes");
                             main.saveConfig();
-                            
+
                             //ADD THIS WORLD DATA TO THE HASHMAP
                             if (main.ctWorldDatas.containsKey(world.getName())) {
                                 if (daynight.equalsIgnoreCase("day")) {
@@ -169,7 +169,7 @@ public class CommandCustomTime implements CommandExecutor{
                                 }
                             }
                             //ADD THIS WORLD DATA TO THE HASHMAP
-                            
+
                             sender.sendMessage(main.mainColor + "Set world " + main.importantColor + world.getName() + " " + main.mainColor + daynight + " to last " + ChatColor.LIGHT_PURPLE + num + " minutes");
                             main.getLogger().log(Level.INFO, "Set world " + world.getName() + " " + daynight + " to last " + num + " minutes.");
                             return true;
@@ -189,7 +189,7 @@ public class CommandCustomTime implements CommandExecutor{
                             main.config.set("worlds." + world.getName() + "." + daynight + ".multiplier", mult);
                             main.config.set("worlds." + world.getName() + "." + daynight + ".desc", num + " hours");
                             main.saveConfig();
-                            
+
                             //ADD THIS WORLD DATA TO THE HASHMAP
                             if (main.ctWorldDatas.containsKey(world.getName())) {
                                 if (daynight.equalsIgnoreCase("day")) {
@@ -208,7 +208,7 @@ public class CommandCustomTime implements CommandExecutor{
                                 }
                             }
                             //ADD THIS WORLD DATA TO THE HASHMAP
-                            
+
                             sender.sendMessage(main.mainColor + "Set world " + main.importantColor + world.getName() + " " + main.mainColor + daynight + " to last " + ChatColor.LIGHT_PURPLE + num + " hours");
                             main.getLogger().log(Level.INFO, "Set world " + world.getName() + " " + daynight + " to last " + num + " hours.");
                             return true;
@@ -228,7 +228,7 @@ public class CommandCustomTime implements CommandExecutor{
                             main.config.set("worlds." + world.getName() + "." + daynight + ".multiplier", mult);
                             main.config.set("worlds." + world.getName() + "." + daynight + ".desc", num + " days");
                             main.saveConfig();
-                            
+
                             //ADD THIS WORLD DATA TO THE HASHMAP
                             if (main.ctWorldDatas.containsKey(world.getName())) {
                                 if (daynight.equalsIgnoreCase("day")) {
@@ -247,7 +247,7 @@ public class CommandCustomTime implements CommandExecutor{
                                 }
                             }
                             //ADD THIS WORLD DATA TO THE HASHMAP
-                            
+
                             sender.sendMessage(main.mainColor + "Set world " + main.importantColor + world.getName() + " " + main.mainColor + daynight + " to last " + ChatColor.LIGHT_PURPLE + num + " days");
                             main.getLogger().log(Level.INFO, "Set world " + world.getName() + " " + daynight + " to last " + num + " days.");
                             return true;
@@ -266,7 +266,7 @@ public class CommandCustomTime implements CommandExecutor{
                             main.config.set("worlds." + world.getName() + "." + daynight + ".multiplier", mult);
                             main.config.set("worlds." + world.getName() + "." + daynight + ".desc", mult + "x speed");
                             main.saveConfig();
-                            
+
                             //ADD THIS WORLD DATA TO THE HASHMAP
                             if (main.ctWorldDatas.containsKey(world.getName())) {
                                 if (daynight.equalsIgnoreCase("day")) {
@@ -285,7 +285,7 @@ public class CommandCustomTime implements CommandExecutor{
                                 }
                             }
                             //ADD THIS WORLD DATA TO THE HASHMAP
-                            
+
                             sender.sendMessage(main.mainColor + "Set world " + main.importantColor + world.getName() + " " + main.mainColor + daynight + " to go at " + ChatColor.LIGHT_PURPLE + mult + "x speed");
                             main.getLogger().log(Level.INFO, "Set world " + world.getName() + " " + daynight + " to last " + mult + "x speed.");
                             return true;

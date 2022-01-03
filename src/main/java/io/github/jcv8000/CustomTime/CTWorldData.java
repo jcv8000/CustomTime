@@ -1,4 +1,4 @@
-package jcv8000.customtime;
+package io.github.jcv8000.CustomTime;
 
 import org.bukkit.World;
 

@@ -1,4 +1,4 @@
-package jcv8000.customtime;
+package io.github.jcv8000.CustomTime;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public class CustomTime extends JavaPlugin {
-    
+
     public FileConfiguration config;
     public BukkitScheduler scheduler;
     public HashMap<String, CTWorldData> ctWorldDatas;
@@ -26,31 +26,31 @@ public class CustomTime extends JavaPlugin {
     public ChatColor importantColor;
     public ChatColor errorColor;
     //boolean canSleep = true;
-    
+
     @Override
     public void onEnable() {
-        
+
         mainColor = ChatColor.GOLD;
         importantColor = ChatColor.LIGHT_PURPLE;
         errorColor = ChatColor.RED;
-        
+
         scheduler = Bukkit.getServer().getScheduler();
         ctWorldDatas = new HashMap<String, CTWorldData>();
-        
+
         // Config loading/setup
         try {
-            
+
             config = getConfig();
             if (config.isConfigurationSection("worlds") == false) {
                 config.createSection("worlds");
             }
 
             saveConfig();
-            
+
         } catch (Exception ex) {
             getLogger().log(Level.SEVERE, "Could not get CustomTime's config file correctly. Make sure it's in the correct format or let the plugin create a new one.");
         }
-        
+
         //get main world
         File propFile = new File("server.properties");
         Properties prop = new Properties();
@@ -65,8 +65,8 @@ public class CustomTime extends JavaPlugin {
             Bukkit.getServer().broadcastMessage(errorColor + "ERROR: Could not find main world because the level-name in server.properties did not point to an existing world, or server.properties could not be loaded correctly.");
             getLogger().log(Level.SEVERE, "Could not find main world because the level-name in server.properties did not point to an existing world, or server.properties could not be loaded correctly.");
         }
-        
-        
+
+
         //Load worlds that are included in the config into the list
         for (String s : config.getConfigurationSection("worlds").getKeys(false)) {
             //worlds.add(Bukkit.getServer().getWorld(s));
@@ -83,7 +83,7 @@ public class CustomTime extends JavaPlugin {
                 getLogger().log(Level.SEVERE, "Could not find world '" + s + "' or it's nether/end. It will not be used in CustomTime.");
             }
         }
-        
+
         //print world list to console
         String worldlist = "";
         if (ctWorldDatas.size() == 0) {
@@ -100,8 +100,8 @@ public class CustomTime extends JavaPlugin {
             }
         }
         getLogger().log(Level.INFO, "Worlds in effect of custom time scales: " + worldlist);
-        
-        
+
+
         //Check all loaded worlds and make sure doDaylightCycle is false
         for (CTWorldData d : ctWorldDatas.values()) {
             World w = d.world;
@@ -114,7 +114,7 @@ public class CustomTime extends JavaPlugin {
                 }
             }
         }
-        
+
 
         //Schedule the repeating task that moves time
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -122,11 +122,11 @@ public class CustomTime extends JavaPlugin {
             public void run() {
 
                 for (CTWorldData data : ctWorldDatas.values()) {
-                    
+
                     if (data.world != null) {
-                        
+
                         long time = data.world.getTime();
-                        
+
                         if (time <= 12000) { //DAY
                             if (data.dayMult > 0.0D && data.dayMult < 1.0D) { //slow down
                                 if (data.tick > (1.0D / data.dayMult)) {
@@ -138,7 +138,7 @@ public class CustomTime extends JavaPlugin {
                                 data.world.setTime(data.world.getTime() + (long)data.dayMult);
                             }
                         }
-                        else if (data.world.getTime() > 12000) { //NIGHT 
+                        else if (data.world.getTime() > 12000) { //NIGHT
                             if (data.nightMult > 0.0D && data.nightMult < 1.0D) { //slow down
                                 if (data.tick > (1.0D / data.nightMult)) {
                                     data.tick = 0;
@@ -155,22 +155,22 @@ public class CustomTime extends JavaPlugin {
                             getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is true in world '" + data.world.getName() + "'. This needs to be false for CustomTime to work. Setting to false.");
                             data.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
                         }
-                        
+
                         // SLEEP CHECKING
                         if (data.world.getTime() > 12000 || data.world.hasStorm()) {
 
                             List<Player> players = data.world.getPlayers();
                             List<Player> sleepers = new ArrayList<Player>();
                             if (players.size() > 0) {
-        
+
                                 for (Player p : players) {
                                     if (p.getSleepTicks() >= 100) {
                                         sleepers.add(p);
                                     }
                                 }
-        
+
                                 int sleepersNeeded = calculateSleepersNeeded(players.size(), data.world.getGameRuleValue(GameRule.PLAYERS_SLEEPING_PERCENTAGE));
-        
+
                                 if (sleepers.size() >= sleepersNeeded) {
 
                                     getLogger().info(sleepers.size() + "/" + sleepersNeeded + " players needed to skip the night are sleeping. Skipping the night.");
@@ -184,26 +184,26 @@ public class CustomTime extends JavaPlugin {
                             }
 
                         }
-                        
+
                     }
                 }
             }
         }, 0L, 1L);
-        
-        
+
+
         this.getCommand("ct").setExecutor(new CommandCustomTime(this));
         this.getCommand("ct").setTabCompleter(new CustomTimeTabCompleter(this));
     }
 
     private int calculateSleepersNeeded(int playerCount, int percentage) {
         int answer = (int)(((double)percentage / 100.0d) * playerCount);
-		
-		if (answer <= 0)
-			return 1;
-		
-		return answer;
+
+        if (answer <= 0)
+            return 1;
+
+        return answer;
     }
-    
+
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);

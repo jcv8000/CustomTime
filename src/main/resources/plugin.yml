@@ -1,0 +1,23 @@
+name: CustomTime
+version: 2.2.0
+main: io.github.jcv8000.CustomTime.CustomTime
+api-version: 1.18
+author: jcv8000
+website: jcv8000.github.io
+prefix: CustomTime
+softdepend: ['Multiverse-Core']
+commands:
+  ct:
+    description: Command to control day/night length.
+    usage: |
+      /ct -- Shows which worlds are being affected and how
+      /ct [day/night] [value][s/m/h/d/x] -- Sets the time scale of the world you're in
+      /ct [day/night] [value][s/m/h/d/x] [world] -- Sets the time scale of [world]
+      /ct help -- Displays the help dialog
+      /ct restart -- Restarts the service
+    permission: customtime.*
+    permission-message: You do not have permission to use this command.
+permissions:
+  customtime.*:
+    description: Allows the CustomTime commands
+    default: op
