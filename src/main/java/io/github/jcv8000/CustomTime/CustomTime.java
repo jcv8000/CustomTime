@@ -25,7 +25,6 @@ public class CustomTime extends JavaPlugin {
     public ChatColor mainColor;
     public ChatColor importantColor;
     public ChatColor errorColor;
-    //boolean canSleep = true;
 
     @Override
     public void onEnable() {
@@ -51,7 +50,7 @@ public class CustomTime extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Could not get CustomTime's config file correctly. Make sure it's in the correct format or let the plugin create a new one.");
         }
 
-        //get main world
+        // Get main world
         File propFile = new File("server.properties");
         Properties prop = new Properties();
         try
@@ -67,9 +66,8 @@ public class CustomTime extends JavaPlugin {
         }
 
 
-        //Load worlds that are included in the config into the list
+        // Load worlds that are included in the config into the list
         for (String s : config.getConfigurationSection("worlds").getKeys(false)) {
-            //worlds.add(Bukkit.getServer().getWorld(s));
             World w;
             try {
                 w = Bukkit.getServer().getWorld(s);
@@ -84,7 +82,7 @@ public class CustomTime extends JavaPlugin {
             }
         }
 
-        //print world list to console
+        // Print world list to console
         String worldlist = "";
         if (ctWorldDatas.size() == 0) {
             worldlist = "[none]";
@@ -102,21 +100,17 @@ public class CustomTime extends JavaPlugin {
         getLogger().log(Level.INFO, "Worlds in effect of custom time scales: " + worldlist);
 
 
-        //Check all loaded worlds and make sure doDaylightCycle is false
+        // Set the doDaylightCycle gamerule to false for loaded worlds
         for (CTWorldData d : ctWorldDatas.values()) {
             World w = d.world;
             if (w != null) {
-                if (w.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE) == true) {
-                    getLogger().log(Level.WARNING, "Gamerule \"doDaylightCycle\" is true in world '" + w.getName() + "'. This needs to be false for CustomTime to work. Setting to false.");
-                    w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-                } else {
-                    getLogger().log(Level.INFO, "Gamerule \"doDaylightCycle\" is false in world '" + w.getName() + "'. Good!");
-                }
+                getLogger().log(Level.INFO, "Setting gamerule \"doDaylightCycle\" to false in world '" + w.getName() + "' for CustomTime to work correctly.");
+                w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
             }
         }
 
 
-        //Schedule the repeating task that moves time
+        // Schedule the repeating task that moves time
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -207,6 +201,17 @@ public class CustomTime extends JavaPlugin {
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
+
+        // Set the doDaylightCycle gamerule back to true so that if the
+        // plugin is deleted people don't think their world is literally broken
+        for (CTWorldData d : ctWorldDatas.values()) {
+            World w = d.world;
+            if (w != null) {
+                getLogger().log(Level.INFO, "Setting gamerule \"doDaylightCycle\" back to true in world '" + w.getName() + "' since CustomTime is disabled.");
+                w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            }
+        }
+
         ctWorldDatas.clear();
     }
 }
