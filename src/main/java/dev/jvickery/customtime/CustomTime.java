@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.annotation.plugin.ApiVersion.Target;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 @Plugin(name="CustomTime", version="3.0")
-@ApiVersion(Target.v1_17)
+@ApiVersion(Target.v1_13)
 @Description("Plugin to control the speed of the day/night cycle")
 @Author("jcv8000")
 @Website("https://github.com/jcv8000/CustomTime")
