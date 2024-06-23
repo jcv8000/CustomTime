@@ -11,7 +11,6 @@ import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.Website;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion.Target;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
-import org.bukkit.scheduler.BukkitScheduler;
 
 @Plugin(name="CustomTime", version="3.0.0")
 @ApiVersion(Target.v1_17)
@@ -24,30 +23,37 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class CustomTime extends JavaPlugin
 {
     static CustomTime inst = null;
-    
-    BukkitScheduler scheduler;
-    CTConfig config = null;
+    WorldDataMap worldDataMap = null;
+
+    public CustomTime() {
+        super();
+        CustomTime.inst = this;
+    }
 
     @Override
     public void onEnable() {
-        inst = this;
-        scheduler = getServer().getScheduler();
+        var logger = getLogger();
 
-        config = CTConfig.loadConfig(this);
-        if (config == null) {
-            // config error
+        worldDataMap = WorldDataMap.loadFromConfig(this);
+        if (worldDataMap == null) {
+            logger.severe("Error loading data from config file.");
+            logger.severe("Plugin will not run.");
+            logger.severe("Check the config.yml for errors, or delete it and reset your worlds' time speeds using the /ct command.");
             return;
         }
+        logger.info("Successfully loaded data from config file");
+        logger.info("Affected worlds: " + worldDataMap.keySet().toString());
 
         // Disable doDaylightCycle for all affected worlds
-        for (var data : config.dataList) {
+        for (var data : worldDataMap.values()) {
             data.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+            logger.info("Disabling doDaylightCycle in world \"" + data.world.getName() + "\".");
         }
 
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                for (var data : config.dataList) {
+                for (var data : worldDataMap.values()) {
                     World world = data.world;
 
                     // Make sure doDaylightCycle is still off
@@ -91,7 +97,22 @@ public class CustomTime extends JavaPlugin
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
-        config.writeConfig(this);
-        config = null;
+
+        // Re-enable doDaylightCycle for all affected worlds
+        for (var data : worldDataMap.values()) {
+            data.world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            getLogger().info("Re-enabling doDaylightCycle in world \"" + data.world.getName() + "\".");
+        }
+
+        if (worldDataMap != null) {
+            WorldDataMap.writeToConfig(this, worldDataMap);
+            worldDataMap = null;
+        }
+    }
+
+    public void updateEntry(String worldName, WorldData data) {
+        if (worldDataMap == null) return; // error
+
+        worldDataMap.put(worldName, data);
     }
 }
