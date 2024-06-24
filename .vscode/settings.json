@@ -1,4 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "explorer.compactFolders": true,
+    "java.format.settings.url": "https://raw.githubusercontent.com/spring-projects/spring-batch/main/spring-eclipse-code-conventions.xml"
 }

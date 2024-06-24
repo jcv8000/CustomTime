@@ -40,7 +40,8 @@ public final class WorldDataMap extends HashMap<String, WorldData> {
                 logger.warning("Could not find world with name \"" + s + "\", skipping.");
                 continue;
             }
-            if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
+            if (world.getEnvironment() == World.Environment.NETHER
+                    || world.getEnvironment() == World.Environment.THE_END) {
                 logger.warning("World \"" + s + "\" is NETHER or END dimension, skipping.");
                 continue;
             }
@@ -58,14 +59,14 @@ public final class WorldDataMap extends HashMap<String, WorldData> {
         return map;
     }
 
-    public static void writeToConfig(JavaPlugin plugin, WorldDataMap dataMap) {
+    public void writeToConfig(JavaPlugin plugin) {
         var config = plugin.getConfig();
         var logger = plugin.getLogger();
 
         config.set("worlds", null);
         config.createSection("worlds");
 
-        for (var data : dataMap.values()) {
+        for (var data : this.values()) {
             String worldName = data.world.getName();
             config.set("worlds." + worldName + ".day.multiplier", data.dayMultiplier);
             config.set("worlds." + worldName + ".day.desc", data.dayMultiplier);
@@ -74,28 +75,7 @@ public final class WorldDataMap extends HashMap<String, WorldData> {
             config.set("worlds." + worldName + ".night.desc", data.nightDescription);
         }
         plugin.saveConfig();
-        
+
         logger.info("Successfully wrote data to config file.");
-    }
-}
-
-final class WorldData {
-    World world;
-
-    double dayMultiplier;
-    String dayDescription;
-    
-    double nightMultiplier;
-    String nightDescription;
-
-    long tick;
-
-    public WorldData(World w, double day, String dayDesc, double night, String nightDesc) {
-        world = w;
-        dayMultiplier = day;
-        dayDescription = dayDesc;
-        nightMultiplier = night;
-        nightDescription = nightDesc;
-        tick = 0;
     }
 }
