@@ -46,7 +46,7 @@ public class CustomTimeTabCompleter implements TabCompleter {
                 var worldList = CustomTime.inst.getServer().getWorlds();
 
                 for (World world : worldList) {
-                    if (world.getEnvironment() != Environment.NETHER && world.getEnvironment() != Environment.THE_END) {
+                    if (world.getEnvironment() == Environment.NORMAL) {
                         list.add(world.getName());
                     }
                 }

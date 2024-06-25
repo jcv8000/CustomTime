@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -40,9 +41,8 @@ public final class WorldDataMap extends HashMap<String, WorldData> {
                 logger.warning("Could not find world with name \"" + s + "\", skipping.");
                 continue;
             }
-            if (world.getEnvironment() == World.Environment.NETHER
-                    || world.getEnvironment() == World.Environment.THE_END) {
-                logger.warning("World \"" + s + "\" is NETHER or END dimension, skipping.");
+            if (world.getEnvironment() != Environment.NORMAL) {
+                logger.warning("World \"" + s + "\" is Nether, End, or Custom dimension. Skipping.");
                 continue;
             }
 

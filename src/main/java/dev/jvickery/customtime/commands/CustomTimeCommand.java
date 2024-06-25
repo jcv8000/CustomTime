@@ -122,8 +122,8 @@ public class CustomTimeCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Error: No world found with name \"" + args[3] + "\"");
                     return true;
                 }
-                if (w.getEnvironment() == Environment.NETHER || w.getEnvironment() == Environment.THE_END) {
-                    sender.sendMessage(ChatColor.RED + "Error: World cannot be Nether or End");
+                if (w.getEnvironment() != Environment.NORMAL) {
+                    sender.sendMessage(ChatColor.RED + "Error: World cannot be Nether, End, or Custom dimension.");
                     return true;
                 }
                 world = w;
