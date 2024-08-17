@@ -165,15 +165,11 @@ public class CustomTimeCommand implements CommandExecutor {
         return false;
     }
 
-    void SetCommand(Time daynight, double multiplier, World world, String description) {
-
-    }
-
     void InfoCommand() {
-
+        // TODO Info Command
     }
 
     void HelpCommand() {
-
+        // TODO Help command
     }
 }

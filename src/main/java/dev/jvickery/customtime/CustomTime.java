@@ -2,11 +2,13 @@ package dev.jvickery.customtime;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.bukkit.GameRule;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -40,6 +42,9 @@ import dev.jvickery.customtime.commands.CustomTimeTabCompleter;
                 + "You can also use the alias /ct"))
 @Permissions(@Permission(name = "customtime.*", desc = "Allows /customtime command", defaultValue = PermissionDefault.OP))
 
+// TODO add an option to disable sleeping
+// TODO there's a gap from 12000 to 12542 where i'm using the night multiplier, but players cant sleep yet
+// TODO add update checking from Modrinth's API.
 public class CustomTime extends JavaPlugin {
     public static CustomTime inst = null;
 
@@ -82,6 +87,8 @@ public class CustomTime extends JavaPlugin {
                 for (var data : worldDataMap.values()) {
                     World world = data.world;
 
+                    checkIfSleepingThroughNight(world);
+
                     // Make sure doDaylightCycle is still off
                     if (world.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE)) {
                         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
@@ -91,7 +98,7 @@ public class CustomTime extends JavaPlugin {
                     double multiplier = 1.0;
 
                     // Choose either day or night multiplier
-                    if (time <= 12000) {
+                    if (time < 12000) {
                         multiplier = data.dayMultiplier;
                     }
                     else {
@@ -106,7 +113,7 @@ public class CustomTime extends JavaPlugin {
                         // Slow down time
                         double ticksNeeded = 1.0 / multiplier;
 
-                        if (data.tick > ticksNeeded) {
+                        if (data.tick >= ticksNeeded) {
                             world.setTime(time + 1);
                             data.tick = 0;
                         }
@@ -136,6 +143,62 @@ public class CustomTime extends JavaPlugin {
             worldDataMap.writeToConfig(this);
             worldDataMap = null;
         }
+    }
+
+    /**
+     * @see https://minecraft.wiki/w/Bed#Sleeping
+     */
+    void checkIfSleepingThroughNight(World world) {
+        var players = world.getPlayers();
+        long time = world.getTime();
+        int playerCount = players.size();
+        int PLAYERS_SLEEPING_PERCENTAGE = world.getGameRuleValue(GameRule.PLAYERS_SLEEPING_PERCENTAGE);
+
+        if (playerCount == 0)
+            return;
+
+        if (PLAYERS_SLEEPING_PERCENTAGE > 100)
+            return;
+
+        if (world.isClearWeather()) {
+            if (time < 12542 || time > 23459)
+                return;
+        }
+
+        // Just rain
+        if (world.isThundering() == false && world.isClearWeather() == false) {
+            if (time < 12010 || time > 23991)
+                return;
+        }
+
+        double percent = PLAYERS_SLEEPING_PERCENTAGE / 100.0;
+        int sleepersNeeded = (int) (percent * playerCount);
+        if (sleepersNeeded <= 0)
+            sleepersNeeded = 1;
+
+        var sleepers = new ArrayList<Player>();
+        for (Player p : players) {
+            if (p.getSleepTicks() >= 100) {
+                sleepers.add(p);
+            }
+        }
+
+        if (sleepers.size() >= sleepersNeeded) {
+            world.setTime(0);
+
+            // If weather is not clear, reset the clear weather cycle
+            // https://minecraft.wiki/w/Rain#Behavior
+            // "and there is a 0.5–7.5 day delay between rains"
+            // = 12,000 to 180,000 ticks
+            if (!world.isClearWeather()) {
+                int duration = getRandomNumber(12000, 180000);
+                world.setClearWeatherDuration(duration);
+            }
+        }
+    }
+
+    int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 
     public World getDefaultWorld() {
